@@ -5,12 +5,12 @@
 - **Using**:
     - Python 3.13
 
-| Calendar                                    | Name           | Language(s) used | Stars         |
-|---------------------------------------------|----------------|------------------|---------------|
-| [Day 01](https://flipflop.slome.org/2025/1) | Dream Vacation | Python           | :star: :star: |
-| [Day 02](https://flipflop.slome.org/2025/2) |                |                  |               |
-| [Day 03](https://flipflop.slome.org/2025/3) |                |                  |               |
-| [Day 04](https://flipflop.slome.org/2025/4) |                |                  |               |
-| [Day 05](https://flipflop.slome.org/2025/5) |                |                  |               |
-| [Day 06](https://flipflop.slome.org/2025/6) |                |                  |               |
-| [Day 07](https://flipflop.slome.org/2025/7) |                |                  |               |
+| Calendar                                    | Name                  | Language(s) used | Stars         |
+|---------------------------------------------|-----------------------|------------------|---------------|
+| [Day 01](https://flipflop.slome.org/2025/1) | Dream Vacation        | Python           | :star: :star: |
+| [Day 02](https://flipflop.slome.org/2025/2) | Rollercoaster Heights | Python           | :star: :star: |
+| [Day 03](https://flipflop.slome.org/2025/3) |                       |                  |               |
+| [Day 04](https://flipflop.slome.org/2025/4) |                       |                  |               |
+| [Day 05](https://flipflop.slome.org/2025/5) |                       |                  |               |
+| [Day 06](https://flipflop.slome.org/2025/6) |                       |                  |               |
+| [Day 07](https://flipflop.slome.org/2025/7) |                       |                  |               |
