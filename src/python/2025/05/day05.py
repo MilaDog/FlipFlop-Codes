@@ -49,7 +49,7 @@ class Solution:
             pos = self.endpoints[pos] + 1
 
         print(f"Part 01: {tlt1}")
-        print(f"Part 02: {"".join(unseen_trains)}")
+        print(f"Part 02: {''.join(unseen_trains)}")
         print(f"Part 03: {tlt2}")
 
 
