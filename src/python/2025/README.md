@@ -1,6 +1,6 @@
 # FlipFlop Codes | 2025
 
-[FlipFlip Codes 2025](https://flipflop.slome.org/2025) - Solutions to each day
+[FlipFlop Codes 2025](https://flipflop.slome.org/2025) - Solutions to each day
 
 - **Using**:
     - Python 3.13
