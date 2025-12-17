@@ -17,7 +17,17 @@ class Solution:
 
     @cache
     def fib(self, n: int) -> int:
-        """Determine the Fibonacci value of `n`."""
+        """Determine the Fibonacci value of `n`.
+
+        Args:
+            n (int): nth Fibonacci Sequence to calculate.
+
+        Returns:
+            int: Fibonacci result.
+        """
+        if n < 0:
+            raise ValueError(f"Value has to be positive, got {n}")
+
         if n == 0 or n == 1:
             return n
         return self.fib(n - 1) + self.fib(n - 2)
