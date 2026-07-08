@@ -9,3 +9,4 @@
 |---------------------------------------------|------------------------------|------------------|----------------------|
 | [Day 01](https://flipflop.slome.org/2026/1) | Prologue: BitFlop Internship | Python           | :star: :star: :star: |
 | [Day 02](https://flipflop.slome.org/2026/2) | Lasering Walls               | Python           | :star: :star: :star: |
+| [Day 03](https://flipflop.slome.org/2026/3) | Password Competition         | Python           | :star: :star: :star: |
