@@ -110,10 +110,6 @@ class Solution:
                 if entry.score > max_score:
                     max_score = entry.score
 
-                # Early break for P01
-                if not allow_direction_change:
-                    break
-
                 # P03 logic
                 if allow_right_turns:
                     if self.is_on_grid_edge(entry=entry):
