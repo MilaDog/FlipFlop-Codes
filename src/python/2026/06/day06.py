@@ -1,7 +1,7 @@
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from enum import IntEnum
-from functools import cache
+from typing import TypeVar
 
 
 class LightLevel(IntEnum):
@@ -58,6 +58,7 @@ class Background:
     position: Position
 
 
+T = TypeVar("T", bound="Gear | Light | Bluetooth | Background")
 Tile = Gear | Light | Bluetooth | Background
 
 
@@ -161,9 +162,8 @@ class Solution:
             print()
         print()
 
-    @cache
     def is_prime(self, num: int) -> bool:
-        """Sieve of Eratosthenes to determine if the given number is prime or not.
+        """Determine if the given number is prime or not.
 
         Args:
             num (int): Number to check.
@@ -173,15 +173,7 @@ class Solution:
         """
         if num < 2:
             return False
-
-        s = [True] * (num + 1)
-        s[0] = s[1] = False
-
-        for i in range(2, int(num**0.5) + 1):
-            if s[i]:
-                for j in range(i * i, num + 1, i):
-                    s[j] = False
-        return s[num]
+        return all(num % i for i in range(2, int(num**0.5) + 1))
 
     def is_within_grid(self, position: Position) -> bool:
         """Determine whether the given position falls within the grid.
@@ -217,40 +209,36 @@ class Solution:
 
         return res
 
-    def get_adjacent_gears(self, tile: Tile) -> list[Tile]:
+    def get_adjacent_of_type(self, tile: Tile, cls: type[T]) -> list[T]:
         """Get all adjacent gears to the given tile.
 
         Args:
             tile (Tile): Tile to search around.
+            cls: Type of tile to filter by.
 
         Returns:
-            list[Tile]: All Gear tiles.
+            list[Tile]: All tiles of the given type.
         """
-        return list(filter(lambda x: isinstance(x, Gear), self.get_adjacent_tiles(tile=tile)))
+        return [t for t in self.get_adjacent_tiles(tile=tile) if isinstance(t, cls)]
 
-    def get_adjacent_bluetooth_devices(self, tile: Tile) -> list[Tile]:
-        """Get all adjacent bluetooth devices to the given tile.
+    def _perform_bfs(self, position: Position, func) -> None:
+        q: deque = deque([self.data.get(position)])
+        seen: set[Position] = set()
 
-        Args:
-            tile (Tile): Tile to search around.
+        while q:
+            tile = q.popleft()
 
-        Returns:
-            list[Tile]: All Bluetooth tiles.
-        """
-        return list(filter(lambda x: isinstance(x, Bluetooth), self.get_adjacent_tiles(tile=tile)))
+            if tile is None or tile.position in seen:
+                continue
+            seen.add(tile.position)
 
-    def get_adjacent_lights(self, tile: Tile) -> list[Tile]:
-        """Get all adjacent lights to the given tile.
+            if not isinstance(tile, (Gear, Bluetooth)):
+                continue
 
-        Args:
-            tile (Tile): Tile to search around.
+            func(tile)
+            q.extend(self.get_adjacent_of_type(tile=tile, cls=Gear))
 
-        Returns:
-            list[Tile]: All Light tiles.
-        """
-        return list(filter(lambda x: isinstance(x, Light), self.get_adjacent_tiles(tile=tile)))
-
-    def get_connected_bluetooth_tiles(self, position: Position) -> list[Tile]:
+    def get_connected_bluetooth_tiles(self, position: Position) -> list[Bluetooth]:
         """Get a list of all positions of bluetooth devices connected to the section of gears.
 
         Args:
@@ -259,36 +247,17 @@ class Solution:
         Returns:
             list[Tile]: List of all bluetooth tile positions found.
         """
-        res: list[Tile] = []
+        res: list[Bluetooth] = []
 
-        q: deque = deque()
-        q.append(self.data.get(position))
-        seen: set[Position] = set()
+        def visit(tile: Gear | Bluetooth) -> None:
+            for bt_device in self.get_adjacent_of_type(tile=tile, cls=Bluetooth):
+                bt_device.is_rotating_clockwise = tile.is_rotating_clockwise
+                res.append(bt_device)
 
-        while q:
-            tile = q.popleft()
-
-            if tile is None or tile.position in seen:
-                continue
-
-            seen.add(tile.position)
-            match tile:
-                case Gear() | Bluetooth():
-                    for neighbour in self.get_adjacent_gears(tile=tile):
-                        q.append(neighbour)
-
-                    # check for connected bluetooth devices
-                    for bt_device in self.get_adjacent_bluetooth_devices(tile=tile):
-                        if isinstance(bt_device, Bluetooth):
-                            bt_device.is_rotating_clockwise = tile.is_rotating_clockwise
-                            res.append(bt_device)
-
-                case _:
-                    continue
-
+        self._perform_bfs(position=position, func=visit)
         return res
 
-    def get_connected_gears(self, position: Position) -> list[Tile]:
+    def get_connected_gears(self, position: Position) -> list[Gear]:
         """Get a list of all connected gears to the given position.
 
         Args:
@@ -297,32 +266,8 @@ class Solution:
         Returns:
             list[Tile]: List of all found connected Gears.
         """
-        res: list[Tile] = []
-
-        q: deque = deque()
-        q.append(self.data.get(position))
-        seen: set[Position] = set()
-
-        while q:
-            tile = q.popleft()
-
-            if tile is None or tile.position in seen:
-                continue
-
-            seen.add(tile.position)
-            match tile:
-                case Gear():
-                    res.append(tile)
-
-                case Bluetooth():
-                    pass
-
-                case _:
-                    continue
-
-            for neighbour in self.get_adjacent_gears(tile=tile):
-                q.append(neighbour)
-
+        res: list[Gear] = []
+        self._perform_bfs(position=position, func=lambda tile: res.append(tile) if isinstance(tile, Gear) else None)
         return res
 
     def rotate_gears(self, position: Position, is_rotating_clockwise: bool) -> None:
@@ -356,7 +301,7 @@ class Solution:
                 case _:
                     continue
 
-            for neighbour in self.get_adjacent_gears(tile=tile):
+            for neighbour in self.get_adjacent_of_type(tile=tile, cls=Gear):
                 q.append((neighbour, not is_rotating_clockwise))
 
     def update_light_levels(self) -> None:
@@ -365,24 +310,21 @@ class Solution:
             for y in range(self.width):
                 target_tile: Tile | None = self.data.get(Position(x=x, y=y), None)
 
-                match target_tile:
-                    case Light():
-                        adjacent_gears: list[Tile] = self.get_adjacent_gears(tile=target_tile)
+                if isinstance(target_tile, Light):
+                    adjacent_gears: list[Gear] = self.get_adjacent_of_type(tile=target_tile, cls=Gear)
 
-                        if not adjacent_gears:
-                            continue
+                    if not adjacent_gears:
+                        continue
 
-                        match target_gear := adjacent_gears[0]:
-                            case Gear(is_rotating_clockwise=r, is_shut_off=off):
-                                if off:
-                                    target_tile.light_level = LightLevel.OFF
-                                else:
-                                    target_tile.light_level = LightLevel.HIGH if r else LightLevel.LOW
-
-                                target_tile.gear_code = target_gear.gear_code
-
-                    case _:
-                        pass
+                    target_gear = adjacent_gears[0]
+                    target_tile.light_level = (
+                        LightLevel.OFF
+                        if target_gear.is_shut_off
+                        else LightLevel.HIGH
+                        if target_gear.is_rotating_clockwise
+                        else LightLevel.LOW
+                    )
+                    target_tile.gear_code = target_gear.gear_code
 
     def determine_lights_code(self, gear_codes: str) -> int:
         """Determine the code from the given lights in the grid.
@@ -395,24 +337,20 @@ class Solution:
         """
         code: str = ""
 
-        light_tiles: list[Tile] = list(filter(lambda x: isinstance(x, Light), self.data.values()))
+        for x in range(self.length):
+            for y in range(self.width):
+                match target_tile := self.data.get(Position(x=x, y=y), None):
+                    case Light(light_level=l):
+                        if target_tile.gear_code not in gear_codes:
+                            continue
 
-        for light_tile in sorted(light_tiles, key=lambda tile: (tile.position.x, tile.position.y)):
-            match light_tile:
-                case Light(light_level=l):
-                    if light_tile.gear_code not in gear_codes:
-                        continue
-
-                    match l:
-                        case LightLevel.HIGH:
-                            code += "1"
-                        case LightLevel.LOW:
-                            code += "0"
-                        case _:
-                            pass
-
-                case _:
-                    continue
+                        match l:
+                            case LightLevel.HIGH:
+                                code += "1"
+                            case LightLevel.LOW:
+                                code += "0"
+                            case _:
+                                pass
 
         if len(code) == 0:
             return -1
@@ -459,7 +397,7 @@ class Solution:
 
                 else:  # Part 03
                     if not receiver.is_shut_off:
-                        connected_gears_to_bt_device: list[Tile] = self.get_connected_gears(position=receiver.position)
+                        connected_gears_to_bt_device: list[Gear] = self.get_connected_gears(position=receiver.position)
                         not_performing_gear_rotating: bool = self.is_prime(num=len(connected_gears_to_bt_device))
 
                         if not_performing_gear_rotating:
