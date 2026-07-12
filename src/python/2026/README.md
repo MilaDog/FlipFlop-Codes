@@ -13,3 +13,4 @@
 | [Day 04](https://flipflop.slome.org/2026/4) | Magic Flowerstalk            | Python           | :star: :star: :star: |
 | [Day 05](https://flipflop.slome.org/2026/5) | One Way City                 | Python           | :star: :star: :star: |
 | [Day 06](https://flipflop.slome.org/2026/6) | Gears And Lights             | Python           | :star: :star: :star: |
+| [Day 07](https://flipflop.slome.org/2026/7) | Ross's Pet Snake             | Python           | :star: :star: :star: |
