@@ -15,3 +15,4 @@
 | [Day 06](https://flipflop.slome.org/2026/6) | Gears And Lights             | Python           | :star: :star: :star: |
 | [Day 07](https://flipflop.slome.org/2026/7) | Ross's Pet Snake             | Python           | :star: :star: :star: |
 | [Day 08](https://flipflop.slome.org/2026/8) | The Amazing Digital Stoats   | Python           | :star: :star: :star: |
+| [Day 09](https://flipflop.slome.org/2026/9) | Thinking With Mazes          | Python           | :star: :star:        |
